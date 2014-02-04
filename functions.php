@@ -1,14 +1,31 @@
+<?php
 /**
-* WordPress Functions
-* @author: Mayeenul Islam (@mayeenulislam)
-* This function page can work under any WordPress theme
-* The code here, are collected from various sources
-*  where the code is collected from somewhere, is mentioned as a comment
-*  where it's solely of Mayeenul Islam, is also mentioned as a comment
+ * WordPress Functions
+ * @author: Mayeenul Islam (@mayeenulislam)
+ * 
+ * This function page can work under any WordPress theme
+ * The code here, are collected from various sources
+ * where the code is collected from somewhere, is mentioned as a comment
+ * where it's solely of Mayeenul Islam, is also mentioned as a comment
 */
+
+
+/**
+ * CHANGE THE 'WPLANG' IN wp-config.php TO bn_BD ON THEME SWITCHING
+ * Thanks: toscho
+ * Source: http://wordpress.stackexchange.com/a/121136/22728
+*/
+
+add_filter( 'locale', 'toscho_change_language' );
+
+function toscho_change_language( $locale ) {
+    return 'bn_BD';
+}
+
 
 /**
  * TRUNCK STRING TO SHORTEN THE STRING
+ * 
  * the code block was collected from Ms. Tahmina Aktar (PHP and WordPress developer)
  * The function shorten any string limiting with the parameter passed
  * through the funciton
@@ -51,8 +68,9 @@ function trunck_string($str = "", $len = 150, $more = 'true') {
 
 
 
-/*
+/**
  * ENABLING ARROW ON PARENT MENU
+ * 
  * This code snippet adds an arrow to the parent menu item
  * where there is/are sub menu[s]
  *
@@ -74,3 +92,47 @@ class arrow_walker_nav_menu extends walker_nav_menu {
         walker_nav_menu::display_element($element, $children_elements, $max_depth, $depth, $args, $output);
     }
 }
+
+
+
+/**
+ * GRAB THE FIRST IMAGE FROM THE POST CONTENT
+ * 
+ * This function will grab the first image from the post
+ * searching the <img> tags inside the post content
+ * 
+ * Source: WordPress.StackExchange.com - Forgotten
+*/
+
+function grab_first_image() {
+    global $post;
+    $first_image = '';
+    ob_start();
+    ob_end_clean();
+    if( $the_output = preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $post->post_content, $matches) )
+    $first_image = $matches[1][0];
+
+    return $first_image;
+}
+
+
+
+/**
+ * REMOVE UNNECESSARY HEADER INFO
+ * 
+ * This function will remove unnecessary information from the <head> tag
+ * to make the site's head more clean and make the site more speedy
+ * 
+ * Source: WordPress.StackExchange.com - Forgotten
+*/
+
+function remove_header_info() {
+    remove_action('wp_head', 'rsd_link');
+    remove_action('wp_head', 'wlwmanifest_link');
+    remove_action('wp_head', 'wp_generator');
+    remove_action('wp_head', 'start_post_rel_link');
+    remove_action('wp_head', 'index_rel_link');
+    remove_action('wp_head', 'adjacent_posts_rel_link');         // for WordPress <  3.0
+    remove_action('wp_head', 'adjacent_posts_rel_link_wp_head'); // for WordPress >= 3.0
+}
+add_action('init', 'remove_header_info');
