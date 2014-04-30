@@ -2,7 +2,7 @@
 /**
  *  Template Name: Get Today's News
  *  
- *  @Developer: Mayeenul Islam, Afiful Islam
+ *  @Developer: Mayeenul Islam, Ariful Haque
  *
  *  A template for WordPress page to get News (Posts)
  *   from the defined categories
