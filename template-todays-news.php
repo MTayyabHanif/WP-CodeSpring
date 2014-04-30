@@ -6,8 +6,8 @@
  *
  *  A template for WordPress page to get News (Posts)
  *   from the defined categories
- *   where they are with meta_key => today
- *   and with meta_value => 1
+ *   where they are with meta_key => print_version
+ *   and with meta_value => yes
  *   and from today's date
  */
 
