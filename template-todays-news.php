@@ -1,6 +1,8 @@
 <?php
 /**
  *  Template Name: Get Today's News
+ *  
+ *  @Developer: Mayeenul Islam, Afiful Islam
  *
  *  A template for WordPress page to get News (Posts)
  *   from the defined categories
