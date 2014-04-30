@@ -43,12 +43,15 @@ add_filter( 'query_vars', 'add_query_vars_filter' );
  *	3.	Meta Key and Meta Value by which you are filtering
  *		 the web contents from the print contents
  *		 i.e. 'meta_key' => 'meta_value'
+ * 
+ * 	4.	Input the Page ID where the Template is used
  */
 
 $default_category = '13'; //Cat ID Only
 $maximum_limit = '30';
 $meta_key = 'print_version';
 $meta_value = 'yes';
+$template_page_id = 25;
 
 ?>
 <!-- FOR TEST PURPOSE ONLY -->
@@ -75,17 +78,17 @@ ul.categories li{
 	        $month_today = date( 'm', current_time( 'timestamp' ) );
 	        $day_today = date( 'd', current_time( 'timestamp' ) );
 			
-	    		$cat_args = array(
-								'date_query' => array(
-								  array(
-								    'year'  => $year_today,
-								    'month' => $month_today,
-								    'day'   => $day_today,
-								  ),
-								),
-								'meta_key' => $meta_key,
-								'meta_value' => $meta_value,
-	                    	);
+    		$cat_args = array(
+				'date_query' => array(
+				  array(
+				    'year'  => $year_today,
+				    'month' => $month_today,
+				    'day'   => $day_today,
+				  ),
+				),
+				'meta_key' => $meta_key,
+				'meta_value' => $meta_value,
+                    	    );
 	            
 	        $get_cats = new WP_Query( $cat_args );
 	    		
@@ -93,12 +96,13 @@ ul.categories li{
 
 	        <?php
       		while( $get_cats->have_posts() ){
-      			$get_cats->the_post();
       			
-      			$category = get_the_category();
-      			
-      			$cat_ID[] = $category[0]->cat_ID;
-              }
+	      	    $get_cats->the_post();
+	      		
+	      	    $category = get_the_category();
+	      		
+	      	    $cat_ID[] = $category[0]->cat_ID;
+                }
       		
       		$the_categories = array_unique( $cat_ID ); //merging common categories
       				 
@@ -107,7 +111,7 @@ ul.categories li{
       		<ul class="categories">
 	        <?php foreach( $the_categories as $news_cat ) { ?>
 	        	<li>
-	                <a href="<?php echo home_url('/news-today') . '?cat='. $news_cat .'';?>">
+	                <a href="<?php echo get_page_link( $template_page_id ) . '?cat='. $news_cat .'';?>">
 	                    <?php echo get_cat_name( $news_cat ); ?>
 	                </a>
 	            </li>
@@ -120,10 +124,10 @@ ul.categories li{
 	        <?php
     			//get from the URL, otherwise go with the default category		
     	        if( get_query_var( 'cat' ) != '' ){
-    				$this_category = get_query_var( 'cat' );
-    			} else {
-    				$this_category = $default_category;
-    			}
+    			$this_category = get_query_var( 'cat' );
+    		} else {
+    			$this_category = $default_category;
+    		}
 	        
 	        $news_args = array(
 	            'cat' => $this_category,
@@ -135,8 +139,8 @@ ul.categories li{
 	                  'day'   => $day_today,
 	                ),
 	              ),
-      				'meta_key' => $meta_key,
-				      'meta_value' => $meta_value
+      		    'meta_key' => $meta_key,
+		    'meta_value' => $meta_value
 	        );
 	        
 	        $get_news = new WP_Query( $news_args );
