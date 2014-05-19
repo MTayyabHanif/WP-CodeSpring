@@ -148,7 +148,7 @@ add_action('init', 'remove_header_info');
  * Source: Codex - http://codex.wordpress.org/Function_Reference/the_excerpt
 */
 
-function nano_excerpt( $limit ) {
+function nano_excerpt( $limit = 75 ) {
     $limited_excerpts = wp_trim_words( get_the_excerpt(), $limit, new_excerpt_more() );
     echo $limited_excerpts;
     return $limited_excerpts;
