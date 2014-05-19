@@ -136,3 +136,29 @@ function remove_header_info() {
     remove_action('wp_head', 'adjacent_posts_rel_link_wp_head'); // for WordPress >= 3.0
 }
 add_action('init', 'remove_header_info');
+
+
+
+/**
+ * THE EXCERPT FILTERS
+ * 
+ * This group of functions will make a new controllable excerpt
+ *  called nano_excerpt()
+ * 
+ * Source: Codex - http://codex.wordpress.org/Function_Reference/the_excerpt
+*/
+
+function nano_excerpt( $limit ) {
+    $limited_excerpts = wp_trim_words( get_the_excerpt(), $limit, new_excerpt_more() );
+    echo $limited_excerpts;
+    return $limited_excerpts;
+}
+
+function new_excerpt_more() {
+    return '... <a class="read-more" href="'. get_permalink( get_the_ID() ) . '">'. __( '&raquo;', 'your-theme' ) .'</a>';
+}
+
+function custom_excerpt_length( $length ) {
+    return 200;
+}
+add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
