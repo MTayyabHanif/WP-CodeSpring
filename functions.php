@@ -162,3 +162,87 @@ function custom_excerpt_length( $length ) {
     return 200;
 }
 add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
+
+
+/**
+ * Alternative to get_current_screen()
+ * @link http://wordpress.stackexchange.com/a/174596/22728
+ * 
+ * @param  string $base      
+ * @param  string $post_type 
+ * @return bool
+ */
+function theme_is_current_screen( $base = null, $post_type = null ) {
+    if ( ! $base && ! $post_type ) {
+        return false;
+    }
+    $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+    if ( ! $screen ) {
+        // Fake it.
+        $screen = new StdClass;
+        $screen->post_type = $screen->base = '';
+
+        global $pagenow;
+        if ( $pagenow == 'admin-ajax.php' ) {
+            if ( isset( $_REQUEST['action'] ) ) {
+                $screen->base = $_REQUEST['action'];
+            }
+        } else {
+            $screen->post_type = isset( $_REQUEST['post_type'] ) ? $_REQUEST['post_type'] : '';
+            if ( $pagenow == 'post.php' || $pagenow == 'post-new.php' || $pagenow == 'edit.php' ) {
+                $screen->base = preg_replace( '/[^a-z].+$/', '', $pagenow );
+                if ( ! $screen->post_type ) {
+                    $screen->post_type = get_post_type( theme_get_post_id() );
+                }
+            } else {
+                $page_hook = '';
+                global $plugin_page;
+                if ( ! empty( $plugin_page ) ) {
+                    if ( $screen->post_type ) {
+                        $the_parent = $pagenow . '?post_type=' . $screen->post_type;
+                    } else {
+                        $the_parent = $pagenow;
+                    }
+                    if ( ! ( $page_hook = get_plugin_page_hook( $plugin_page, $the_parent ) ) ) {
+                        $page_hook = get_plugin_page_hook( $plugin_page, $plugin_page );
+                    }
+                }
+                $screen->base = $page_hook ? $page_hook : pathinfo( $pagenow, PATHINFO_FILENAME );
+            }
+        }
+    }
+    // The base type of the screen. This is typically the same as $id but with any post types and taxonomies stripped.
+    if ( $base ) {
+        if ( ! is_array( $base ) ) $base = array( $base );
+        if ( ! in_array( $screen->base, $base ) ) {
+            return false;
+        }
+    }
+    if ( $post_type ) {
+        if ( ! is_array( $post_type ) ) $post_type  = array( $post_type );
+        if ( ! in_array( $screen->post_type, $post_type ) ) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/*
+ * Attempt to determine post id in uncertain (admin) situations.
+ * Based on WPAlchemy_MetaBox::_get_post_id().
+ */
+function theme_get_post_id() {
+    global $post;
+
+    $ret = 0;
+
+    if ( ! empty( $post->ID ) ) {
+        $ret = $post->ID;
+    } elseif ( ! empty( $_GET['post'] ) && ctype_digit( $_GET['post'] ) ) {
+        $ret = $_GET['post'];
+    } elseif ( ! empty( $_POST['post_ID'] ) && ctype_digit( $_POST['post_ID'] ) ) {
+        $ret = $_POST['post_ID'];
+    }
+
+    return $ret;
+}
